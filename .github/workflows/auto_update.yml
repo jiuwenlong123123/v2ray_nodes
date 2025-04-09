@@ -1,0 +1,30 @@
+name: Auto Update V2Ray Nodes
+
+on:
+  schedule:
+    - cron: '0 2 * * *'  # 每天凌晨2点自动更新
+  workflow_dispatch:
+
+jobs:
+  update-v2ray:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    - name: Download and merge V2Ray node sources
+      run: |
+        mkdir -p tmp
+        curl -sL -o tmp/1.txt https://raw.githubusercontent.com/freefq/free/master/v2
+        curl -sL -o tmp/2.txt https://raw.githubusercontent.com/aiboboxx/v2rayfree/main/v2
+        curl -sL -o tmp/3.txt https://raw.githubusercontent.com/mahdibland/V2RayAggregator/master/sub/sub_merge.txt
+        cat tmp/*.txt > 2.txt
+
+    - name: Commit and push changes
+      run: |
+        git config --global user.name "GitHub Action"
+        git config --global user.email "action@github.com"
+        git add 2.txt
+        git commit -m "Daily update V2Ray nodes"
+        git push
